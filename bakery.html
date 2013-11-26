@@ -1,0 +1,157 @@
+<html>
+<head>
+  <title>Bakery Bonanza</title>
+  <style type="text/css">
+  #bakery .display div { width: 200px; height: 200px; float: left; }
+  #bakery .display .cupcake { background: url("http://i.imgur.com/9ix2JRZ.jpg"); }
+  #bakery .display .cookie { background: url("http://i.imgur.com/Yxq78qn.jpg"); }
+  #bakery .display .poundCake { background: url(http://img4-3.southernliving.timeinc.net/i/2010/05/pound-cake/two-step-pound-cake-l.jpg?400:400);}
+  </style>
+</head>
+<body>
+
+<div id="bakery">
+  <button class="make" data-good-type="cupcake">Make Cupcake</button>
+  <button class="make" data-good-type="cookie">Make Cookie</button>
+  <button class="make" data-good-type="poundCake">Make Pound Cake</button>
+  <h4 class="money">Available Money: $<span></span></h4>
+
+  <h4>Available Ingredients:</h4>
+  <ul class="ingredients">
+    <li class="flour">Flour: <span></span>
+    <br>
+    <button class="buy" data-ingredient="flour">Buy more Flour: $2</button>
+    </li>
+    <br>
+    <li class="eggs">Eggs: <span></span>
+    <br
+    ><button class="buy" data-ingredient="eggs">Buy more Eggs: $3</button>
+    </li>
+    <br>
+    <li class="sugar">Sugar: <span></span>
+    <br>
+    <button class="buy" data-ingredient="sugar">Buy more Sugar: $1</button>
+    </li>
+    <br>
+    <li class="spice">Spice: <span></span>
+    <br>
+    <button class="buy" data-ingredient="spice">Buy more Spices: $8</button>
+    </li>
+    <br>
+    <li class="coconut">Coconut: <span></span>
+    <br>
+    <button class="buy" data-ingredient="coconut">Buy more Coconut: $6</button></li>
+  </ul>
+
+  <h3>Food Display Case</h3>
+  <div class="display"></div>
+</div>
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+
+var bakery = {
+  money: 50,
+  supplies: {
+    flour: 4,
+    eggs: 12,
+    sugar: 17,
+    spice: 5,
+    coconut: 6
+  },
+  costs: {
+    flour: 2,
+    eggs: 3,
+    sugar: 1,
+    spice: 8,
+    coconut: 6
+  },
+  goodRequirements: {
+    cupcake: {
+      flour: 2,
+      eggs: 1,
+      sugar: 1
+    },
+    cookie: {
+      flour: 1,
+      eggs: 1,
+      sugar: 1,
+      spice: 1
+    },
+    poundCake: {
+      flour: 1,
+      eggs: 2,
+      sugar: 1,
+      coconut: 1,
+    }
+    // TODO: Create required ingredients for cookie
+  },
+  make: function (goodType) {
+    console.log('Attempting to make a:', goodType);
+    var req = this.goodRequirements[goodType];
+    var able_to_bake = false;
+
+    for(var key in req) {
+      console.log(req[key]);
+      console.log(bakery.supplies[key]);
+      if( req[key] <= bakery.supplies[key] ) {
+        able_to_bake = true;
+        bakery.supplies[key] -= req[key];
+      }else {
+        able_to_bake = false;
+        break;
+      }
+    }
+
+    // TODO: Only make if we have enough ingredients
+    if (able_to_bake) {
+      // TODO: Reduce the bakery's supplies by the required amount
+      this.updateIngredientsList();
+      console.log('The bakery made a ' + goodType + '!');
+
+      // TODO: Add class goodType class to div
+      var goodDiv = $('<div class="' + goodType + '">');
+      $('#bakery .display').append(goodDiv);
+    }else {
+      alert("Sorry, but you don't have enough ingredients to make that!");
+      console.log("Baking FAILED!");
+    }
+  },
+  updateIngredientsList: function () {
+    $('.ingredients .flour span').text(this.supplies.flour);
+    $('.ingredients .eggs span').text(this.supplies.eggs);
+    $('.ingredients .sugar span').text(this.supplies.sugar);
+    $('.ingredients .spice span').text(this.supplies.spice);
+    $('.ingredients .coconut span').text(this.supplies.coconut);
+    $('.money span').text(this.money);
+  }
+};
+
+$('#bakery .buy').on('click', function (e) {
+  var goodType = $(e.currentTarget).data('ingredient');
+  // TODO: Make the good
+  console.log(goodType);
+  if(bakery.costs[goodType] <= bakery.money) {
+    bakery.money = bakery.money - bakery.costs[goodType];
+    bakery.supplies[goodType] += 1;
+    console.log(bakery.supplies[goodType]);
+    bakery.updateIngredientsList();
+  }else {
+    alert("You are out of money! Bakery FAIL!");
+  }
+});
+
+
+$('#bakery .make').on('click', function (e) {
+  var goodType = $(e.currentTarget).data('good-type');
+  // TODO: Make the good
+  bakery.make(goodType);
+});
+
+
+bakery.updateIngredientsList();
+
+</script>
+</body>
+</html>
